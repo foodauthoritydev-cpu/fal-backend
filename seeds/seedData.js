@@ -57,7 +57,13 @@ const seed = async () => {
 
   const home = await HomeContent.create({
     headerTitle: 'Food Authority Liberia (FAL)',
-    hero: { title: 'Food Authority of Liberia (FAL)', subtitle: 'Protecting consumers and ensuring fair food trade', images: [] },
+    hero: {
+      title: 'Food Authority of Liberia (FAL)',
+      subtitle: 'Protecting consumers and ensuring fair food trade',
+      images: [],
+      overlayColor: 'rgba(0, 0, 0, 0.25)',
+      backgroundImage: ''
+    },
     snippets: { about: bio, news: 'Latest news and media', objectives: 'Our strategic goals', gallery: 'Highlights' },
     contactInfo: { address: '', email: '', phone: '' },
     footer: { address: '', email: '', phone: '' }

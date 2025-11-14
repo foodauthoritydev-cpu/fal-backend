@@ -5,7 +5,9 @@ const homeSchema = new mongoose.Schema({
   hero: {
     title: { type: String, default: '' },
     subtitle: { type: String, default: '' },
-    images: { type: [String], default: [] } // data URI base64
+    images: { type: [String], default: [] }, // data URI base64
+    overlayColor: { type: String, default: '' },
+    backgroundImage: { type: String, default: '' }
   },
   snippets: {
     about: { type: String, default: '' },

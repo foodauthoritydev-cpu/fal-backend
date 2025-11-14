@@ -27,6 +27,8 @@ const updateHome = async (req, res) => {
         doc.hero.title = payload.hero.title ?? doc.hero.title
         doc.hero.subtitle = payload.hero.subtitle ?? doc.hero.subtitle
         doc.hero.images = payload.hero.images ?? doc.hero.images
+        doc.hero.overlayColor = payload.hero.overlayColor ?? doc.hero.overlayColor
+        doc.hero.backgroundImage = payload.hero.backgroundImage ?? doc.hero.backgroundImage
       }
       if (payload.snippets) {
         doc.snippets.about = payload.snippets.about ?? doc.snippets.about
