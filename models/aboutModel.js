@@ -3,6 +3,7 @@ const mongoose = require('mongoose')
 const additionalSectionSchema = new mongoose.Schema({
   title: { type: String, default: '' },
   content: { type: String, default: '' },
+  type: { type: String, enum: ['text', 'list'], default: 'text' },
   image: { type: String, default: '' } // base64 data URI
 }, { _id: false })
 

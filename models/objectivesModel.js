@@ -9,6 +9,7 @@ const objectiveItemSchema = new mongoose.Schema({
 const sectionSchema = new mongoose.Schema({
   title: { type: String, default: '' },
   content: { type: String, default: '' },
+  type: { type: String, enum: ['text', 'list'], default: 'text' },
   image: { type: String, default: '' }
 }, { _id: false })
 
