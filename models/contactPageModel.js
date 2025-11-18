@@ -6,7 +6,15 @@ const contactPageSchema = new mongoose.Schema({
   image: { type: String, default: '' },
   address: { type: String, default: '' },
   email: { type: String, default: '' },
-  phone: { type: String, default: '' }
+  phone: { type: String, default: '' },
+  socialLinks: {
+    type: [{
+      platform: { type: String, default: '' },
+      url: { type: String, default: '' },
+      label: { type: String, default: '' }
+    }],
+    default: []
+  }
 }, { timestamps: true })
 
 module.exports = mongoose.model('ContactPage', contactPageSchema)

@@ -61,7 +61,7 @@ const seed = async () => {
       title: 'Food Authority of Liberia (FAL)',
       subtitle: 'Protecting consumers and ensuring fair food trade',
       images: [],
-      overlayColor: 'rgba(0, 0, 0, 0.25)',
+      overlayColor: 'rgba(0, 0, 0, 0.85)',
       backgroundImage: ''
     },
     snippets: { about: bio, news: 'Latest news and media', objectives: 'Our strategic goals', gallery: 'Highlights' },
@@ -112,7 +112,15 @@ const seed = async () => {
     { name: 'Codex Alimentarius Commission', image: '', link: '' }
   ])
 
-  const contactPage = await ContactPage.create({ title: 'Contact Us', description: 'Reach the Food Authority of Liberia', image: '', address: '', email: '', phone: '' })
+  const contactPage = await ContactPage.create({
+    title: 'Contact Us',
+    description: 'Reach the Food Authority of Liberia',
+    image: '',
+    address: '',
+    email: '',
+    phone: '',
+    socialLinks: []
+  })
 
   const adminUsername = process.env.ADMIN_USERNAME || 'superadmin'
   const adminPassword = process.env.ADMIN_PASSWORD || 'ChangeMe123!'
