@@ -19,7 +19,12 @@ const { notFound, errorHandler } = require('./middleware/errorMiddleware')
 connectDB()
 
 const app = express()
+
 app.use(cors({
+  origin: true,
+  credentials: true,
+}))
+app.options('*', cors({
   origin: true,
   credentials: true,
 }))
