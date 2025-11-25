@@ -14,20 +14,22 @@ const teamRoutes = require('./routes/teamRoutes')
 const galleryRoutes = require('./routes/galleryRoutes')
 const { page: partnershipPageRoutes, partners: partnerRoutes } = require('./routes/partnershipRoutes')
 const contactRoutes = require('./routes/contactRoutes')
+const foodPremisesRoutes = require('./routes/foodPremisesRoutes')
 const { notFound, errorHandler } = require('./middleware/errorMiddleware')
 
 connectDB()
 
 const app = express()
 
-app.use(cors({
+const corsOptions = {
   origin: true,
   credentials: true,
-}))
-app.options('*', cors({
-  origin: true,
-  credentials: true,
-}))
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}
+
+app.use(cors(corsOptions))
+app.options(/(.*)/, cors(corsOptions))
 app.set('trust proxy', 1)
 app.use(express.json({ limit: '100mb' }))
 app.use(express.urlencoded({ extended: true, limit: '100mb' }))
@@ -62,6 +64,7 @@ app.use('/api/gallery', galleryRoutes)
 app.use('/api/partnerships', partnershipPageRoutes)
 app.use('/api/partners', partnerRoutes)
 app.use('/api/contact', contactRoutes)
+app.use('/api/food-premises', foodPremisesRoutes)
 
 app.use(notFound)
 app.use(errorHandler)
