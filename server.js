@@ -1,6 +1,7 @@
 require('dotenv').config()
 const express = require('express')
 const cors = require('cors')
+const path = require('path')
 const session = require('express-session')
 const MongoStore = require('connect-mongo')
 const connectDB = require('./config')
@@ -16,6 +17,7 @@ const { page: partnershipPageRoutes, partners: partnerRoutes } = require('./rout
 const contactRoutes = require('./routes/contactRoutes')
 const foodPremisesRoutes = require('./routes/foodPremisesRoutes')
 const careerRoutes = require('./routes/careerRoutes')
+const faActRoutes = require('./routes/faActRoutes')
 const { notFound, errorHandler } = require('./middleware/errorMiddleware')
 
 connectDB()
@@ -34,6 +36,7 @@ app.options(/(.*)/, cors(corsOptions))
 app.set('trust proxy', 1)
 app.use(express.json({ limit: '100mb' }))
 app.use(express.urlencoded({ extended: true, limit: '100mb' }))
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')))
 
 const sessionSecret = process.env.SESSION_SECRET || 'change_me'
 app.use(session({
@@ -67,6 +70,7 @@ app.use('/api/partners', partnerRoutes)
 app.use('/api/contact', contactRoutes)
 app.use('/api/food-premises', foodPremisesRoutes)
 app.use('/api/careers', careerRoutes)
+app.use('/api/fa-act', faActRoutes)
 
 app.use(notFound)
 app.use(errorHandler)
