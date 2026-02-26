@@ -5,7 +5,7 @@ const faActSchema = new mongoose.Schema({
   title: { type: String, default: 'Food Authority Act' },
   brief: { type: String, default: '' },
   highlights: { type: [String], default: [] },
-  pdfFile: { type: String, default: '' }, // file URL (e.g. https://host/uploads/pdf/*.pdf)
+  pdfFile: { type: String, default: '' }, // data URI: data:application/pdf;base64,...
   pdfFileName: { type: String, default: '' }
 }, { timestamps: true })
 

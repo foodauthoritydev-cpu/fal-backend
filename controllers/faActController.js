@@ -1,5 +1,32 @@
 const FAActContent = require('../models/faActModel')
 
+const normalizePdfData = (value) => {
+  if (value === null || value === undefined) return ''
+  if (typeof value !== 'string') return null
+
+  const trimmed = value.trim()
+  if (!trimmed) return ''
+
+  if (/^https?:\/\//i.test(trimmed) || trimmed.startsWith('/uploads/')) {
+    return null
+  }
+
+  if (/^data:application\/pdf;base64,/i.test(trimmed)) {
+    return trimmed
+  }
+
+  if (/^data:[^;]+;base64,/i.test(trimmed)) {
+    return null
+  }
+
+  const compact = trimmed.replace(/\s+/g, '')
+  if (/^[A-Za-z0-9+/=]+$/.test(compact)) {
+    return `data:application/pdf;base64,${compact}`
+  }
+
+  return null
+}
+
 const getFAAct = async (req, res) => {
   try {
     let doc = await FAActContent.findOne()
@@ -27,7 +54,13 @@ const updateFAAct = async (req, res) => {
     if (Array.isArray(payload.highlights)) {
       doc.highlights = payload.highlights.map(item => String(item).trim()).filter(Boolean)
     }
-    if (payload.pdfFile !== undefined) doc.pdfFile = payload.pdfFile
+    if (payload.pdfFile !== undefined) {
+      const normalizedPdf = normalizePdfData(payload.pdfFile)
+      if (normalizedPdf === null) {
+        return res.status(400).json({ message: 'pdfFile must be a base64 PDF payload.' })
+      }
+      doc.pdfFile = normalizedPdf
+    }
     if (payload.pdfFileName !== undefined) doc.pdfFileName = payload.pdfFileName
 
     await doc.save()

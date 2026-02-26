@@ -8,10 +8,12 @@ const uploadSingleImage = (req, res) => {
 
 const uploadSinglePdf = (req, res) => {
   if (!req.file) return res.status(400).json({ message: 'No PDF uploaded or invalid file type' })
-  const host = `${req.protocol}://${req.get('host')}`
+  const mimeType = req.file.mimetype || 'application/pdf'
+  const dataUri = bufferToDataURI(req.file.buffer, mimeType)
   res.json({
-    fileUrl: `${host}/uploads/pdf/${req.file.filename}`,
-    fileName: req.file.originalname
+    base64: dataUri,
+    fileName: req.file.originalname,
+    mimeType
   })
 }
 
