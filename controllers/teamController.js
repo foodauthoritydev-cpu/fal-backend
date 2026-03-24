@@ -17,7 +17,6 @@ const updateTeamPage = async (req, res) => {
     let doc = await TeamPage.findOne()
     if (doc) {
       if (payload.description !== undefined) doc.description = payload.description
-      if (payload.headerImage !== undefined) doc.headerImage = payload.headerImage
       await doc.save()
     } else {
       doc = await TeamPage.create(payload)
@@ -30,9 +29,9 @@ const updateTeamPage = async (req, res) => {
 
 const createMember = async (req, res) => {
   try {
-    const { name, role, bio, image } = req.body
+    const { name, role, bio, image, section } = req.body
     if (!name) return res.status(400).json({ message: 'Name is required' })
-    const doc = await TeamMember.create({ name, role, bio, image })
+    const doc = await TeamMember.create({ name, role, bio, image, section })
     res.status(201).json(doc)
   } catch (e) {
     res.status(500).json({ message: 'Server error' })
@@ -60,13 +59,14 @@ const getMember = async (req, res) => {
 
 const updateMember = async (req, res) => {
   try {
-    const { name, role, bio, image } = req.body
+    const { name, role, bio, image, section } = req.body
     const doc = await TeamMember.findById(req.params.id)
     if (!doc) return res.status(404).json({ message: 'Not found' })
     if (name !== undefined) doc.name = name
     if (role !== undefined) doc.role = role
     if (bio !== undefined) doc.bio = bio
     if (image !== undefined) doc.image = image
+    if (section !== undefined) doc.section = section
     await doc.save()
     res.json(doc)
   } catch (e) {

@@ -1,4 +1,32 @@
 const GalleryItem = require('../models/galleryItemModel')
+const GalleryPage = require('../models/galleryPageModel')
+
+const getGalleryPage = async (req, res) => {
+  try {
+    const doc = await GalleryPage.findOne()
+    if (!doc) return res.status(404).json({ message: 'Gallery page not found' })
+    res.json(doc)
+  } catch (e) {
+    res.status(500).json({ message: 'Server error' })
+  }
+}
+
+const updateGalleryPage = async (req, res) => {
+  try {
+    const payload = req.body
+    let doc = await GalleryPage.findOne()
+    if (doc) {
+      if (payload.description !== undefined) doc.description = payload.description
+      if (payload.headerImage !== undefined) doc.headerImage = payload.headerImage
+      await doc.save()
+    } else {
+      doc = await GalleryPage.create(payload)
+    }
+    res.json(doc)
+  } catch (e) {
+    res.status(500).json({ message: 'Server error' })
+  }
+}
 
 const createItem = async (req, res) => {
   try {
@@ -56,4 +84,4 @@ const deleteItem = async (req, res) => {
   }
 }
 
-module.exports = { createItem, listItems, bulkCreate, updateItem, deleteItem }
+module.exports = { getGalleryPage, updateGalleryPage, createItem, listItems, bulkCreate, updateItem, deleteItem }

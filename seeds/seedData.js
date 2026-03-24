@@ -11,6 +11,7 @@ const NewsPost = require('../models/newsPostModel')
 const TeamPage = require('../models/teamPageModel')
 const TeamMember = require('../models/teamMemberModel')
 const GalleryItem = require('../models/galleryItemModel')
+const GalleryPage = require('../models/galleryPageModel')
 const PartnershipPage = require('../models/partnershipPageModel')
 const Partner = require('../models/partnerModel')
 const ContactPage = require('../models/contactPageModel')
@@ -49,6 +50,7 @@ const seed = async () => {
     TeamPage.deleteMany({}),
     TeamMember.deleteMany({}),
     GalleryItem.deleteMany({}),
+    GalleryPage.deleteMany({}),
     PartnershipPage.deleteMany({}),
     Partner.deleteMany({}),
     ContactPage.deleteMany({}),
@@ -101,7 +103,9 @@ const seed = async () => {
     image: ''
   })
 
-  const teamPage = await TeamPage.create({ description: 'Build a dynamic and professional workforce and enable effective operations, supported by strong communication', headerImage: '' })
+  const teamPage = await TeamPage.create({ description: 'Build a dynamic and professional workforce and enable effective operations, supported by strong communication' })
+
+  const galleryPage = await GalleryPage.create({ description: 'Browse our recent images and media.', headerImage: '' })
 
   const partnershipPage = await PartnershipPage.create({ title: 'Partnerships', description: 'Engagement with domestic, regional, and international partners to strengthen Liberia’s food regulatory system', image: '' })
 
