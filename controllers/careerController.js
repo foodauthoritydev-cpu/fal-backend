@@ -2,6 +2,24 @@ const Career = require('../models/careerModel')
 const CareerPage = require('../models/careerPageModel')
 const Application = require('../models/applicationModel')
 
+const normalizeStringList = (value) => {
+  if (!Array.isArray(value)) return []
+  return value
+    .map(item => String(item || '').trim())
+    .filter(Boolean)
+}
+
+const buildCareerPayload = (body = {}) => ({
+  ...body,
+  title: String(body.title || 'New Position').trim() || 'New Position',
+  department: String(body.department || '').trim(),
+  description: String(body.description || '').trim() || 'Add job description.',
+  requirements: normalizeStringList(body.requirements),
+  responsibilities: normalizeStringList(body.responsibilities),
+  type: String(body.type || 'Full Time').trim() || 'Full Time',
+  location: String(body.location || 'Monrovia').trim() || 'Monrovia'
+})
+
 const getPage = async (req, res) => {
   try {
     let page = await CareerPage.findOne()
@@ -51,7 +69,7 @@ const getJob = async (req, res) => {
 
 const createJob = async (req, res) => {
   try {
-    const job = await Career.create(req.body)
+    const job = await Career.create(buildCareerPayload(req.body))
     res.status(201).json(job)
   } catch (error) {
     res.status(400).json({ message: error.message })
@@ -60,7 +78,7 @@ const createJob = async (req, res) => {
 
 const updateJob = async (req, res) => {
   try {
-    const job = await Career.findByIdAndUpdate(req.params.id, req.body, { new: true })
+    const job = await Career.findByIdAndUpdate(req.params.id, buildCareerPayload(req.body), { new: true, runValidators: true })
     if (!job) return res.status(404).json({ message: 'Job not found' })
     res.json(job)
   } catch (error) {
