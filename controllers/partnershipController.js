@@ -31,9 +31,9 @@ const updatePage = async (req, res) => {
 
 const createPartner = async (req, res) => {
   try {
-    const { name, image, link } = req.body
+    const { name, image, link, section } = req.body
     if (!name) return res.status(400).json({ message: 'Name is required' })
-    const doc = await Partner.create({ name, image, link })
+    const doc = await Partner.create({ name, image, link, section })
     res.status(201).json(doc)
   } catch (e) {
     res.status(500).json({ message: 'Server error' })
@@ -51,12 +51,13 @@ const listPartners = async (req, res) => {
 
 const updatePartner = async (req, res) => {
   try {
-    const { name, image, link } = req.body
+    const { name, image, link, section } = req.body
     const doc = await Partner.findById(req.params.id)
     if (!doc) return res.status(404).json({ message: 'Not found' })
     if (name !== undefined) doc.name = name
     if (image !== undefined) doc.image = image
     if (link !== undefined) doc.link = link
+    if (section !== undefined) doc.section = section
     await doc.save()
     res.json(doc)
   } catch (e) {

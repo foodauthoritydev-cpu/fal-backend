@@ -110,10 +110,10 @@ const seed = async () => {
   const partnershipPage = await PartnershipPage.create({ title: 'Partnerships', description: 'Engagement with domestic, regional, and international partners to strengthen Liberia’s food regulatory system', image: '' })
 
   const partners = await Partner.insertMany([
-    { name: 'ECOWAS', image: '', link: '' },
-    { name: 'African Union (AU)', image: '', link: '' },
-    { name: 'AfCFTA', image: '', link: '' },
-    { name: 'Codex Alimentarius Commission', image: '', link: '' }
+    { name: 'ECOWAS', image: '', link: '', section: 'advisory' },
+    { name: 'African Union (AU)', image: '', link: '', section: 'advisory' },
+    { name: 'AfCFTA', image: '', link: '', section: 'scientific' },
+    { name: 'Codex Alimentarius Commission', image: '', link: '', section: 'scientific' }
   ])
 
   const contactPage = await ContactPage.create({
@@ -123,6 +123,8 @@ const seed = async () => {
     address: '',
     email: '',
     phone: '',
+    hotlinePhone: '',
+    hoursOfOperation: '',
     socialLinks: []
   })
 

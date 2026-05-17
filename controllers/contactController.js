@@ -22,6 +22,8 @@ const updatePage = async (req, res) => {
       if (payload.address !== undefined) doc.address = payload.address
       if (payload.email !== undefined) doc.email = payload.email
       if (payload.phone !== undefined) doc.phone = payload.phone
+      if (payload.hotlinePhone !== undefined) doc.hotlinePhone = payload.hotlinePhone
+      if (payload.hoursOfOperation !== undefined) doc.hoursOfOperation = payload.hoursOfOperation
       if (payload.socialLinks !== undefined) doc.socialLinks = payload.socialLinks
       await doc.save()
     } else {

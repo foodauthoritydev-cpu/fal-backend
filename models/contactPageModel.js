@@ -7,6 +7,8 @@ const contactPageSchema = new mongoose.Schema({
   address: { type: String, default: '' },
   email: { type: String, default: '' },
   phone: { type: String, default: '' },
+  hotlinePhone: { type: String, default: '' },
+  hoursOfOperation: { type: String, default: '' },
   socialLinks: {
     type: [{
       platform: { type: String, default: '' },

@@ -17,6 +17,7 @@ const { page: partnershipPageRoutes, partners: partnerRoutes } = require('./rout
 const contactRoutes = require('./routes/contactRoutes')
 const foodPremisesRoutes = require('./routes/foodPremisesRoutes')
 const careerRoutes = require('./routes/careerRoutes')
+const servicesRoutes = require('./routes/servicesRoutes')
 const faActRoutes = require('./routes/faActRoutes')
 const { notFound, errorHandler } = require('./middleware/errorMiddleware')
 
@@ -70,6 +71,7 @@ app.use('/api/partners', partnerRoutes)
 app.use('/api/contact', contactRoutes)
 app.use('/api/food-premises', foodPremisesRoutes)
 app.use('/api/careers', careerRoutes)
+app.use('/api/services', servicesRoutes)
 app.use('/api/fa-act', faActRoutes)
 
 app.use(notFound)
