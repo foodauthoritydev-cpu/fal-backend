@@ -160,6 +160,80 @@ exports.getMyApplication = async (req, res) => {
   }
 }
 
+// Public: Verify a premises certificate / registration
+exports.verifyCertificate = async (req, res) => {
+  try {
+    const { code } = req.query
+    if (!code || !code.trim()) {
+      return res.status(400).json({ message: 'A premises code or registration number is required' })
+    }
+    const q = code.trim()
+    const app = await FoodPremisesApp.findOne({
+      status: 'approved',
+      $or: [{ falPremisesCode: q }, { businessRegistrationNumber: q }]
+    })
+    if (!app) {
+      return res.status(404).json({ message: 'No valid FAL certificate found for that code' })
+    }
+    res.json({
+      valid: true,
+      premisesName: app.premisesName,
+      county: app.county,
+      typeOfPremises: app.typeOfPremises,
+      falPremisesCode: app.falPremisesCode || '',
+      hasCertificate: !!app.certificate
+    })
+  } catch (error) {
+    res.status(500).json({ message: error.message })
+  }
+}
+
+// Public: Track an application by email + business registration number
+exports.trackApplication = async (req, res) => {
+  try {
+    const { email, reg } = req.query
+    if (!email || !reg) {
+      return res.status(400).json({ message: 'Email and business registration number are required' })
+    }
+    const app = await FoodPremisesApp.findOne({
+      email: email.trim(),
+      businessRegistrationNumber: reg.trim()
+    })
+    if (!app) {
+      return res.status(404).json({ message: 'No application found for those details' })
+    }
+    res.json({
+      premisesName: app.premisesName,
+      status: app.status,
+      submittedAt: app.createdAt,
+      falPremisesCode: app.falPremisesCode || ''
+    })
+  } catch (error) {
+    res.status(500).json({ message: error.message })
+  }
+}
+
+// Public: List approved premises for the public registry
+exports.listPublicRegistry = async (req, res) => {
+  try {
+    const filter = { status: 'approved' }
+    if (req.query.q) {
+      const q = req.query.q.trim()
+      filter.$or = [
+        { premisesName: new RegExp(q, 'i') },
+        { county: new RegExp(q, 'i') },
+        { falPremisesCode: new RegExp(q, 'i') }
+      ]
+    }
+    const apps = await FoodPremisesApp.find(filter)
+      .select('premisesName county district typeOfPremises falPremisesCode createdAt')
+      .sort({ createdAt: -1 })
+    res.json(apps)
+  } catch (error) {
+    res.status(500).json({ message: error.message })
+  }
+}
+
 // Admin: Get All Applications
 exports.getAllApplications = async (req, res) => {
   try {

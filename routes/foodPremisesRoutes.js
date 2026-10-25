@@ -8,12 +8,18 @@ const {
   getMyApplication,
   getAllApplications,
   reviewApplication,
-  createBusinessAccount
+  createBusinessAccount,
+  verifyCertificate,
+  trackApplication,
+  listPublicRegistry
 } = require('../controllers/foodPremisesController')
 
 // Public Routes
 router.get('/content', getPageContent)
 router.post('/apply', submitApplication)
+router.get('/verify', verifyCertificate)
+router.get('/track', trackApplication)
+router.get('/registry', listPublicRegistry)
 
 // Protected Routes (Food Business)
 router.get('/my-application', requireAuth, getMyApplication)

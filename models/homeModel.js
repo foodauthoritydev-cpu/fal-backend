@@ -24,6 +24,12 @@ const homeSchema = new mongoose.Schema({
     address: { type: String, default: '' },
     email: { type: String, default: '' },
     phone: { type: String, default: '' }
+  },
+  emergencyAlert: {
+    enabled: { type: Boolean, default: false },
+    message: { type: String, default: '' },
+    severity: { type: String, enum: ['info', 'warning', 'critical'], default: 'warning' },
+    link: { type: String, default: '' }
   }
 }, { timestamps: true })
 
