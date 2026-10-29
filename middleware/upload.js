@@ -17,7 +17,25 @@ const pdfFileFilter = (req, file, cb) => {
 const imageUpload = multer({ storage: imageStorage, fileFilter: imageFileFilter, limits: { fileSize: 5 * 1024 * 1024 } })
 const pdfUpload = multer({ storage: pdfStorage, fileFilter: pdfFileFilter, limits: { fileSize: 50 * 1024 * 1024 } })
 
+const documentTypes = {
+  '.pdf': 'application/pdf',
+  '.doc': 'application/msword',
+  '.docx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+  '.ppt': 'application/vnd.ms-powerpoint',
+  '.pptx': 'application/vnd.openxmlformats-officedocument.presentationml.presentation'
+}
+const documentUpload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 20 * 1024 * 1024 },
+  fileFilter: (req, file, cb) => {
+    const extension = require('path').extname(file.originalname).toLowerCase()
+    cb(null, !!documentTypes[extension] && file.mimetype === documentTypes[extension])
+  }
+})
+
 module.exports = {
+  documentUpload,
+  documentTypes,
   imageUpload,
   pdfUpload
 }
