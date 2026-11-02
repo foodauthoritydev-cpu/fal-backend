@@ -2,6 +2,8 @@ const FoodPremisesPage = require('../models/foodPremisesPageModel')
 const FoodPremisesApp = require('../models/foodPremisesAppModel')
 const User = require('../models/userModel')
 const { hashPassword } = require('../utils/encryption')
+const { deleteFile } = require('../utils/b2Storage')
+const { sendVerificationEmail, setVerificationCode } = require('../utils/emailService')
 
 // Public: Get Page Content
 exports.getPageContent = async (req, res) => {
@@ -57,12 +59,13 @@ exports.submitApplication = async (req, res) => {
 
     let userId = req.session?.user?.id
     let credentials = null
+    let verificationSent = false
 
     // If not logged in, create user
     if (!userId) {
       // 1. Check if user exists (by phone/username)
-      const username = contactNumbers.trim() 
-      
+      const username = contactNumbers.trim()
+
       const existingUser = await User.findOne({ username })
       if (existingUser) {
         return res.status(400).json({ message: 'An account with this phone number already exists. Please login to submit.' })
@@ -77,9 +80,16 @@ exports.submitApplication = async (req, res) => {
         username,
         password: hashedPassword,
         role: 'foodBusiness',
-        isActive: true
+        isActive: true,
+        email: email || ''
       })
-      
+
+      if (email) {
+        const code = setVerificationCode(newUser)
+        await newUser.save()
+        verificationSent = await sendVerificationEmail({ email, name: businessOwnerName, code })
+      }
+
       userId = newUser._id
       credentials = { username, password: rawPassword }
     } else {
@@ -87,6 +97,16 @@ exports.submitApplication = async (req, res) => {
       const existingApp = await FoodPremisesApp.findOne({ user: userId })
       if (existingApp) {
         return res.status(400).json({ message: 'You have already submitted an application.' })
+      }
+
+      // Keep the account email in sync and (re)send verification if needed
+      const account = await User.findById(userId)
+      if (account && email && (account.email !== email || !account.emailVerified)) {
+        account.email = email
+        account.emailVerified = false
+        const code = setVerificationCode(account)
+        await account.save()
+        verificationSent = await sendVerificationEmail({ email, name: businessOwnerName, code })
       }
     }
 
@@ -112,7 +132,8 @@ exports.submitApplication = async (req, res) => {
     res.status(201).json({
       message: 'Application submitted successfully.',
       credentials, // Will be null if authenticated
-      applicationId: newApp._id
+      applicationId: newApp._id,
+      verificationSent
     })
 
   } catch (error) {
@@ -124,9 +145,9 @@ exports.submitApplication = async (req, res) => {
 // Admin: Create Business Account
 exports.createBusinessAccount = async (req, res) => {
   try {
-    const { username, password } = req.body
+    const { username, password, email } = req.body
     if (!username || !password) return res.status(400).json({ message: 'Username and password required' })
-    
+
     const exists = await User.findOne({ username })
     if (exists) return res.status(400).json({ message: 'User already exists' })
 
@@ -135,10 +156,70 @@ exports.createBusinessAccount = async (req, res) => {
       username,
       password: hashedPassword,
       role: 'foodBusiness',
-      isActive: true
+      isActive: true,
+      email: email || ''
     })
 
-    res.status(201).json({ message: 'Business account created', user })
+    let verificationSent = false
+    if (email) {
+      const code = setVerificationCode(user)
+      await user.save()
+      verificationSent = await sendVerificationEmail({ email, name: username, code })
+    }
+
+    res.status(201).json({ message: 'Business account created', user, verificationSent })
+  } catch (error) {
+    res.status(500).json({ message: error.message })
+  }
+}
+
+// Public: Verify account email with the code sent via EmailJS
+exports.verifyEmail = async (req, res) => {
+  try {
+    const { email, code } = req.body
+    if (!email || !code) {
+      return res.status(400).json({ message: 'Email and verification code are required' })
+    }
+    const user = await User.findOne({ email: String(email).trim() })
+    if (!user || !user.verificationCode) {
+      return res.status(400).json({ message: 'No pending verification for that email' })
+    }
+    if (user.verificationExpires && user.verificationExpires < new Date()) {
+      return res.status(400).json({ message: 'Verification code has expired. Request a new one.' })
+    }
+    if (user.verificationCode !== String(code).trim()) {
+      return res.status(400).json({ message: 'Incorrect verification code' })
+    }
+    user.emailVerified = true
+    user.verificationCode = ''
+    user.verificationExpires = undefined
+    await user.save()
+
+    if (req.session?.user?.id === user._id.toString()) {
+      req.session.user.emailVerified = true
+    }
+
+    res.json({ success: true, message: 'Email verified successfully' })
+  } catch (error) {
+    res.status(500).json({ message: error.message })
+  }
+}
+
+// Public: Resend the verification code
+exports.resendVerification = async (req, res) => {
+  try {
+    const { email } = req.body
+    if (!email) {
+      return res.status(400).json({ message: 'Email is required' })
+    }
+    const user = await User.findOne({ email: String(email).trim() })
+    if (user && !user.emailVerified) {
+      const code = setVerificationCode(user)
+      await user.save()
+      await sendVerificationEmail({ email: user.email, name: user.username, code })
+    }
+    // Always report success so the endpoint can't be used to enumerate accounts
+    res.json({ success: true, message: 'If an unverified account exists for that email, a new code has been sent.' })
   } catch (error) {
     res.status(500).json({ message: error.message })
   }
@@ -256,7 +337,10 @@ exports.reviewApplication = async (req, res) => {
     }
 
     if (status) app.status = status
-    if (certificate) app.certificate = certificate
+    if (certificate && certificate !== app.certificate) {
+      await deleteFile(app.certificate)
+      app.certificate = certificate
+    }
 
     await app.save()
     res.json(app)

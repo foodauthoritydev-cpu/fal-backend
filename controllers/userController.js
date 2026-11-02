@@ -7,8 +7,8 @@ const login = async (req, res) => {
   if (!user || !user.isActive) return res.status(401).json({ message: 'Invalid credentials' })
   const ok = comparePassword(password, user.password)
   if (!ok) return res.status(401).json({ message: 'Invalid credentials' })
-  req.session.user = { id: user._id.toString(), role: user.role, username: user.username }
-  res.json({ _id: user._id, username: user.username, role: user.role })
+  req.session.user = { id: user._id.toString(), role: user.role, username: user.username, email: user.email || '', emailVerified: !!user.emailVerified }
+  res.json({ _id: user._id, username: user.username, role: user.role, email: user.email || '', emailVerified: !!user.emailVerified })
 }
 
 const logout = (req, res) => {

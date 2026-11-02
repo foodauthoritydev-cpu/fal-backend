@@ -1,4 +1,5 @@
 const NewsPost = require('../models/newsPostModel')
+const { deleteFile } = require('../utils/b2Storage')
 
 const createPost = async (req, res) => {
   try {
@@ -55,6 +56,7 @@ const deletePost = async (req, res) => {
   try {
     const doc = await NewsPost.findByIdAndDelete(req.params.id)
     if (!doc) return res.status(404).json({ message: 'Not found' })
+    await Promise.all((doc.images || []).map(deleteFile))
     res.json({ success: true })
   } catch {
     res.status(500).json({ message: 'Server error' })
@@ -67,8 +69,9 @@ const deleteImage = async (req, res) => {
     const doc = await NewsPost.findById(req.params.id)
     if (!doc) return res.status(404).json({ message: 'Not found' })
     if (!Array.isArray(doc.images) || index < 0 || index >= doc.images.length) return res.status(400).json({ message: 'Index out of range' })
-    doc.images.splice(index, 1)
+    const [removed] = doc.images.splice(index, 1)
     await doc.save()
+    await deleteFile(removed)
     res.json({ success: true })
   } catch {
     res.status(500).json({ message: 'Server error' })

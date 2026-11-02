@@ -1,27 +1,29 @@
-const { bufferToDataURI } = require('../utils/image')
+const path = require('path')
+const { uploadFile } = require('../utils/b2Storage')
 
-const uploadSingleImage = (req, res) => {
+const uploadSingleImage = async (req, res) => {
   if (!req.file) return res.status(400).json({ message: 'No file uploaded or invalid mime type' })
-  const dataUri = bufferToDataURI(req.file.buffer, req.file.mimetype)
-  res.json({ base64: dataUri })
+  try {
+    const result = await uploadFile(req.file.buffer, req.file.originalname, req.file.mimetype, 'images')
+    res.status(201).json(result)
+  } catch {
+    res.status(500).json({ message: 'Unable to upload image' })
+  }
 }
 
-const uploadSinglePdf = (req, res) => {
+const uploadSinglePdf = async (req, res) => {
   if (!req.file) return res.status(400).json({ message: 'No PDF uploaded or invalid file type' })
   const mimeType = req.file.mimetype || 'application/pdf'
-  const dataUri = bufferToDataURI(req.file.buffer, mimeType)
-  res.json({
-    base64: dataUri,
-    fileName: req.file.originalname,
-    mimeType
-  })
+  try {
+    const result = await uploadFile(req.file.buffer, req.file.originalname, mimeType, 'pdfs')
+    res.status(201).json({ ...result, fileName: req.file.originalname, mimeType })
+  } catch {
+    res.status(500).json({ message: 'Unable to upload PDF' })
+  }
 }
 
 const uploadDocument = async (req, res) => {
   if (!req.file) return res.status(400).json({ message: 'Upload a PDF, Word or PowerPoint document (maximum 20MB)' })
-  const path = require('path')
-  const fs = require('fs/promises')
-  const { randomUUID } = require('crypto')
   const extension = path.extname(req.file.originalname).toLowerCase()
   const buffer = req.file.buffer
   const valid = extension === '.pdf'
@@ -31,14 +33,31 @@ const uploadDocument = async (req, res) => {
       : buffer.subarray(0, 8).equals(Buffer.from([0xd0, 0xcf, 0x11, 0xe0, 0xa1, 0xb1, 0x1a, 0xe1]))
   if (!valid) return res.status(400).json({ message: 'Document contents do not match its file type' })
   try {
-    const directory = path.join(__dirname, '../uploads/documents')
-    await fs.mkdir(directory, { recursive: true })
-    const name = `${randomUUID()}${extension}`
-    await fs.writeFile(path.join(directory, name), buffer, { flag: 'wx' })
-    res.status(201).json({ url: `/uploads/documents/${name}`, fileName: req.file.originalname, mimeType: req.file.mimetype })
+    const result = await uploadFile(buffer, req.file.originalname, req.file.mimetype, 'documents')
+    res.status(201).json({ ...result, fileName: req.file.originalname, mimeType: req.file.mimetype })
   } catch {
     res.status(500).json({ message: 'Unable to store document' })
   }
 }
 
-module.exports = { uploadSingleImage, uploadSinglePdf, uploadDocument }
+const uploadResume = async (req, res) => {
+  if (!req.file) return res.status(400).json({ message: 'Upload a PDF or Word document (maximum 20MB)' })
+  try {
+    const result = await uploadFile(req.file.buffer, req.file.originalname, req.file.mimetype, 'resumes')
+    res.status(201).json({ ...result, fileName: req.file.originalname, mimeType: req.file.mimetype })
+  } catch {
+    res.status(500).json({ message: 'Unable to upload resume' })
+  }
+}
+
+const uploadVideo = async (req, res) => {
+  if (!req.file) return res.status(400).json({ message: 'No video uploaded or invalid mime type' })
+  try {
+    const result = await uploadFile(req.file.buffer, req.file.originalname, req.file.mimetype, 'videos')
+    res.status(201).json({ ...result, fileName: req.file.originalname, mimeType: req.file.mimetype })
+  } catch {
+    res.status(500).json({ message: 'Unable to upload video' })
+  }
+}
+
+module.exports = { uploadSingleImage, uploadSinglePdf, uploadDocument, uploadResume, uploadVideo }

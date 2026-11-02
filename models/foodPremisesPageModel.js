@@ -3,14 +3,14 @@ const mongoose = require('mongoose')
 const sectionSchema = new mongoose.Schema({
   title: { type: String, required: true },
   content: { type: String, required: true }, // HTML or text
-  pdfFile: { type: String } // Base64 string for the PDF
+  pdfFile: { type: String } // B2 file URL for the PDF
 })
 
 const foodPremisesPageSchema = new mongoose.Schema({
   header: {
     title: { type: String, default: 'Food Premises' },
     description: { type: String, default: '' },
-    image: { type: String, default: '' } // Base64
+    image: { type: String, default: '' } // B2 file URL
   },
   foodLaws: [sectionSchema],
   feeSchedule: [sectionSchema]

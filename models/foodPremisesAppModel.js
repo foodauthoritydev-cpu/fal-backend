@@ -16,7 +16,7 @@ const foodPremisesAppSchema = new mongoose.Schema({
   businessRegistrationNumber: { type: String, required: true },
   falPremisesCode: { type: String }, // Optional, maybe assigned by admin
   status: { type: String, enum: ['pending', 'approved', 'rejected'], default: 'pending' },
-  certificate: { type: String } // Base64 string of the uploaded certificate
+  certificate: { type: String } // B2 URL of the uploaded certificate
 }, { timestamps: true })
 
 module.exports = mongoose.model('FoodPremisesApp', foodPremisesAppSchema)

@@ -1,32 +1,11 @@
 const HomeContent = require('../models/homeModel')
+const { deleteFile } = require('../utils/b2Storage')
 
 const getHome = async (req, res) => {
   try {
     const doc = await HomeContent.findOne()
     if (!doc) return res.status(404).json({ message: 'Home content not found' })
-    if (req.query.full === '1') {
-      return res.json(doc)
-    }
-    // Public payload: strip hero images (they are fetched one-by-one via /home/hero/:index)
-    const out = doc.toObject()
-    out.hero.imageCount = Array.isArray(out.hero.images) ? out.hero.images.length : 0
-    delete out.hero.images
-    res.json(out)
-  } catch (e) {
-    res.status(500).json({ message: 'Server error' })
-  }
-}
-
-const getHeroImage = async (req, res) => {
-  try {
-    const index = Number(req.params.index)
-    const doc = await HomeContent.findOne()
-    if (!doc) return res.status(404).json({ message: 'Home content not found' })
-    const images = doc.hero?.images || []
-    if (Number.isNaN(index) || index < 0 || index >= images.length) {
-      return res.status(404).json({ message: 'Image not found' })
-    }
-    res.json({ image: images[index] })
+    res.json(doc)
   } catch (e) {
     res.status(500).json({ message: 'Server error' })
   }
@@ -93,12 +72,13 @@ const deleteHeroImage = async (req, res) => {
     if (!Array.isArray(doc.hero.images) || index < 0 || index >= doc.hero.images.length) {
       return res.status(400).json({ message: 'Index out of range' })
     }
-    doc.hero.images.splice(index, 1)
+    const [removed] = doc.hero.images.splice(index, 1)
     await doc.save()
+    await deleteFile(removed)
     res.json({ success: true })
   } catch (e) {
     res.status(500).json({ message: 'Server error' })
   }
 }
 
-module.exports = { getHome, getHeroImage, updateHome, deleteHeroImage }
+module.exports = { getHome, updateHome, deleteHeroImage }

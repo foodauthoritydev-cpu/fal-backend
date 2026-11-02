@@ -11,12 +11,16 @@ const {
   createBusinessAccount,
   verifyCertificate,
   trackApplication,
-  listPublicRegistry
+  listPublicRegistry,
+  verifyEmail,
+  resendVerification
 } = require('../controllers/foodPremisesController')
 
 // Public Routes
 router.get('/content', getPageContent)
 router.post('/apply', submitApplication)
+router.post('/verify-email', verifyEmail)
+router.post('/resend-verification', resendVerification)
 router.get('/verify', verifyCertificate)
 router.get('/track', trackApplication)
 router.get('/registry', listPublicRegistry)

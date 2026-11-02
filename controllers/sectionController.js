@@ -1,4 +1,5 @@
 const SectionContent = require('../models/sectionModel')
+const { deleteFile } = require('../utils/b2Storage')
 
 const getSection = async (req, res) => {
   try {
@@ -36,8 +37,10 @@ const deleteSectionImage = async (req, res) => {
     const { key } = req.params
     const doc = await SectionContent.findOne({ key })
     if (!doc) return res.status(404).json({ message: 'Section not found' })
+    const removed = doc.heroImage
     doc.heroImage = ''
     await doc.save()
+    await deleteFile(removed)
     res.json({ success: true })
   } catch (e) {
     res.status(500).json({ message: 'Server error' })

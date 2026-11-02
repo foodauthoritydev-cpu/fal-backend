@@ -1,6 +1,7 @@
 const Career = require('../models/careerModel')
 const CareerPage = require('../models/careerPageModel')
 const Application = require('../models/applicationModel')
+const { deleteFile } = require('../utils/b2Storage')
 
 const normalizeStringList = (value) => {
   if (!Array.isArray(value)) return []
@@ -157,7 +158,8 @@ const updateApplicationStatus = async (req, res) => {
 
 const deleteApplication = async (req, res) => {
   try {
-    await Application.findByIdAndDelete(req.params.id)
+    const application = await Application.findByIdAndDelete(req.params.id)
+    if (application) await deleteFile(application.resume)
     res.json({ message: 'Application deleted' })
   } catch (error) {
     res.status(500).json({ message: error.message })

@@ -1,4 +1,5 @@
 const FAActContent = require('../models/faActModel')
+const { deleteFile } = require('../utils/b2Storage')
 
 const normalizePdfData = (value) => {
   if (value === null || value === undefined) return ''
@@ -8,7 +9,7 @@ const normalizePdfData = (value) => {
   if (!trimmed) return ''
 
   if (/^https?:\/\//i.test(trimmed) || trimmed.startsWith('/uploads/')) {
-    return null
+    return trimmed
   }
 
   if (/^data:application\/pdf;base64,/i.test(trimmed)) {
@@ -57,8 +58,9 @@ const updateFAAct = async (req, res) => {
     if (payload.pdfFile !== undefined) {
       const normalizedPdf = normalizePdfData(payload.pdfFile)
       if (normalizedPdf === null) {
-        return res.status(400).json({ message: 'pdfFile must be a base64 PDF payload.' })
+        return res.status(400).json({ message: 'pdfFile must be a file URL or base64 PDF payload.' })
       }
+      if (normalizedPdf !== doc.pdfFile) await deleteFile(doc.pdfFile)
       doc.pdfFile = normalizedPdf
     }
     if (payload.pdfFileName !== undefined) doc.pdfFileName = payload.pdfFileName

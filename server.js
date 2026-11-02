@@ -16,6 +16,7 @@ const galleryRoutes = require('./routes/galleryRoutes')
 const { page: partnershipPageRoutes, partners: partnerRoutes } = require('./routes/partnershipRoutes')
 const contactRoutes = require('./routes/contactRoutes')
 const foodPremisesRoutes = require('./routes/foodPremisesRoutes')
+const productRoutes = require('./routes/productRoutes')
 const careerRoutes = require('./routes/careerRoutes')
 const servicesRoutes = require('./routes/servicesRoutes')
 const faActRoutes = require('./routes/faActRoutes')
@@ -41,7 +42,14 @@ app.options(/(.*)/, cors(corsOptions))
 app.set('trust proxy', 1)
 app.use(express.json({ limit: '100mb' }))
 app.use(express.urlencoded({ extended: true, limit: '100mb' }))
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')))
+app.use('/uploads', express.static(path.join(__dirname, 'uploads'), {
+  setHeaders: (res, filePath) => {
+    if (res.req.query.download !== undefined) {
+      const name = res.req.query.name || path.basename(filePath)
+      res.setHeader('Content-Disposition', `attachment; filename="${String(name).replace(/"/g, '')}"`)
+    }
+  }
+}))
 
 const sessionSecret = process.env.SESSION_SECRET || 'change_me'
 app.use(session({
@@ -74,6 +82,7 @@ app.use('/api/partnerships', partnershipPageRoutes)
 app.use('/api/partners', partnerRoutes)
 app.use('/api/contact', contactRoutes)
 app.use('/api/food-premises', foodPremisesRoutes)
+app.use('/api/products', productRoutes)
 app.use('/api/careers', careerRoutes)
 app.use('/api/services', servicesRoutes)
 app.use('/api/fa-act', faActRoutes)

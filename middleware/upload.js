@@ -33,9 +33,16 @@ const documentUpload = multer({
   }
 })
 
+const videoUpload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 100 * 1024 * 1024 },
+  fileFilter: (req, file, cb) => cb(null, /^video\//.test(file.mimetype))
+})
+
 module.exports = {
   documentUpload,
   documentTypes,
   imageUpload,
-  pdfUpload
+  pdfUpload,
+  videoUpload
 }

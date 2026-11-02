@@ -1,5 +1,6 @@
 const GalleryItem = require('../models/galleryItemModel')
 const GalleryPage = require('../models/galleryPageModel')
+const { deleteFile } = require('../utils/b2Storage')
 
 const getGalleryPage = async (req, res) => {
   try {
@@ -78,6 +79,7 @@ const deleteItem = async (req, res) => {
   try {
     const doc = await GalleryItem.findByIdAndDelete(req.params.id)
     if (!doc) return res.status(404).json({ message: 'Not found' })
+    await deleteFile(doc.image)
     res.json({ success: true })
   } catch (e) {
     res.status(500).json({ message: 'Server error' })

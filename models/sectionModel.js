@@ -3,7 +3,7 @@ const mongoose = require('mongoose')
 const sectionItemSchema = new mongoose.Schema({
   title: { type: String, default: '' },
   description: { type: String, default: '' },
-  image: { type: String, default: '' }, // base64 data URI
+  image: { type: String, default: '' }, // B2 file URL
   fileUrl: { type: String, default: '' }, // downloadable document
   fileName: { type: String, default: '' },
   mimeType: { type: String, default: '' },

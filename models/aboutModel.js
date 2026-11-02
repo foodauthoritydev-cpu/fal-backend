@@ -4,7 +4,7 @@ const additionalSectionSchema = new mongoose.Schema({
   title: { type: String, default: '' },
   content: { type: String, default: '' },
   type: { type: String, enum: ['text', 'list'], default: 'text' },
-  image: { type: String, default: '' } // base64 data URI
+  image: { type: String, default: '' } // B2 file URL
 }, { _id: false })
 
 const aboutSchema = new mongoose.Schema({
