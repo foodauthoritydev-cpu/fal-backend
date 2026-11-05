@@ -45,16 +45,19 @@ exports.submitApplication = async (req, res) => {
       premisesName,
       businessOwnerName,
       contactNumbers,
+      contactNumbers2,
       email,
       physicalAddress,
       county,
       district,
       typeOfPremises,
+      otherPremiseType,
       productCategories,
       otherProductCategory,
       numberOfEmployees,
       businessRegistrationNumber,
-      falPremisesCode
+      falPremisesCode,
+      dateOfListing
     } = req.body
 
     let userId = req.session?.user?.id
@@ -116,16 +119,19 @@ exports.submitApplication = async (req, res) => {
       premisesName,
       businessOwnerName,
       contactNumbers,
+      contactNumbers2,
       email,
       physicalAddress,
       county,
       district,
       typeOfPremises,
+      otherPremiseType,
       productCategories,
       otherProductCategory,
       numberOfEmployees,
       businessRegistrationNumber,
       falPremisesCode,
+      dateOfListing,
       status: 'pending'
     })
 

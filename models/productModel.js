@@ -2,7 +2,7 @@ const mongoose = require('mongoose')
 
 const productRegistrationSchema = new mongoose.Schema({
   user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
-  application: { type: mongoose.Schema.Types.ObjectId, ref: 'FoodPremisesApp', required: true },
+  application: { type: mongoose.Schema.Types.ObjectId, ref: 'FoodPremisesApp' },
   premiseName: { type: String, required: true },
   productName: { type: String, required: true },
   brandName: { type: String, default: '' },

@@ -8,8 +8,10 @@ const {
   reviewProduct
 } = require('../controllers/productController')
 
+// Public Route (creates an account for anonymous users)
+router.post('/', submitProduct)
+
 // Protected Routes (Food Business)
-router.post('/', requireAuth, submitProduct)
 router.get('/mine', requireAuth, getMyProducts)
 
 // Admin Routes

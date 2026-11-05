@@ -5,16 +5,19 @@ const foodPremisesAppSchema = new mongoose.Schema({
   premisesName: { type: String, required: true },
   businessOwnerName: { type: String, required: true },
   contactNumbers: { type: String, required: true },
-  email: { type: String, required: true },
-  physicalAddress: { type: String, required: true },
-  county: { type: String, required: true },
-  district: { type: String, required: true },
+  contactNumbers2: { type: String, default: '' },
+  email: { type: String, default: '' },
+  physicalAddress: { type: String, default: '' },
+  county: { type: String, default: '' },
+  district: { type: String, default: '' },
   typeOfPremises: [{ type: String }], // Retailer, Wholesaler, etc.
-  productCategories: [{ type: String }], // Dairy, Beverages, etc.
+  otherPremiseType: { type: String, default: '' },
+  productCategories: [{ type: String }], // Food, Beverages, etc.
   otherProductCategory: { type: String },
-  numberOfEmployees: { type: Number, required: true },
-  businessRegistrationNumber: { type: String, required: true },
+  numberOfEmployees: { type: Number },
+  businessRegistrationNumber: { type: String },
   falPremisesCode: { type: String }, // Optional, maybe assigned by admin
+  dateOfListing: { type: String },
   status: { type: String, enum: ['pending', 'approved', 'rejected'], default: 'pending' },
   certificate: { type: String } // B2 URL of the uploaded certificate
 }, { timestamps: true })
