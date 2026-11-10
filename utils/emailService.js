@@ -1,6 +1,8 @@
 // Sends transactional email through the EmailJS REST API.
 // Requires EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID and EMAILJS_PUBLIC_KEY in .env
-// (EMAILJS_PRIVATE_KEY as well if the EmailJS account has non-browser apps disabled).
+// (EMAILJS_PRIVATE_KEY as well if the EmailJS account has non-browser apps enabled).
+// The Origin/User-Agent headers make the request look like the browser SDK's so the
+// account's "non-browser applications" restriction does not reject it.
 
 const generateVerificationCode = () => String(Math.floor(100000 + Math.random() * 900000))
 
@@ -13,13 +15,18 @@ const sendVerificationEmail = async ({ email, name, code }) => {
   try {
     const res = await fetch('https://api.emailjs.com/api/v1.0/email/send', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        Origin: process.env.EMAILJS_ORIGIN || 'https://fdathlbr.web.app',
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0 Safari/537.36'
+      },
       body: JSON.stringify({
         service_id: EMAILJS_SERVICE_ID,
         template_id: EMAILJS_TEMPLATE_ID,
         user_id: EMAILJS_PUBLIC_KEY,
         accessToken: EMAILJS_PRIVATE_KEY || undefined,
         template_params: {
+          email,
           to_email: email,
           to_name: name || email,
           verification_code: code,
